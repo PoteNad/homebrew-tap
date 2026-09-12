@@ -11,6 +11,13 @@ cask "potenad" do
 
   app "PoteNad.app"
 
+  postflight_steps do
+    run "/usr/bin/codesign",
+        args: ["--verify", "--deep", "--strict", "{{appdir}}/PoteNad.app"]
+    run "/usr/bin/xattr",
+        args: ["-dr", "com.apple.quarantine", "{{appdir}}/PoteNad.app"]
+  end
+
   zap trash: [
     "~/Library/Application Support/PoteNad",
     "~/Library/Preferences/io.github.PoteNad.potenad.plist",
@@ -18,7 +25,7 @@ cask "potenad" do
   ]
 
   caveats <<~EOS
-    If macOS blocks the first launch, try opening PoteNad once and then choose
-    Open Anyway in System Settings > Privacy & Security.
+    PoteNad is not Apple-notarized. This cask verifies the app bundle and removes
+    its quarantine attribute so it can open normally after installation.
   EOS
 end

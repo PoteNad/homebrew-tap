@@ -6,4 +6,4 @@ Install [PoteNad](https://github.com/PoteNad/potenad):
 brew install --cask PoteNad/tap/potenad
 ```
 
-PoteNad is not notarized. If macOS blocks the first launch, try opening it once and then choose **Open Anyway** in **System Settings → Privacy & Security**.
+PoteNad is not Apple-notarized. The cask verifies the app bundle and removes its quarantine attribute so it can open normally after installation.
