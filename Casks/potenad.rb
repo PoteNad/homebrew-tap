@@ -23,9 +23,4 @@ cask "potenad" do
     "~/Library/Preferences/io.github.PoteNad.potenad.plist",
     "~/Library/Saved Application State/io.github.PoteNad.potenad.savedState",
   ]
-
-  caveats <<~EOS
-    PoteNad is not Apple-notarized. This cask verifies the app bundle and removes
-    its quarantine attribute so it can open normally after installation.
-  EOS
 end
