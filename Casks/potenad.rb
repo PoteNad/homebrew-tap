@@ -16,4 +16,9 @@ cask "potenad" do
     "~/Library/Preferences/io.github.PoteNad.potenad.plist",
     "~/Library/Saved Application State/io.github.PoteNad.potenad.savedState",
   ]
+
+  caveats <<~EOS
+    If macOS blocks the first launch, try opening PoteNad once and then choose
+    Open Anyway in System Settings > Privacy & Security.
+  EOS
 end
