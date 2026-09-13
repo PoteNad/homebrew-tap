@@ -1,0 +1,42 @@
+name: Update Cask
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Update to the latest PoteNad release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="$(gh api repos/PoteNad/potenad/releases/latest --jq '.tag_name | ltrimstr("v")')"
+          SHA256="$(gh api repos/PoteNad/potenad/releases/latest --jq '.assets[] | select(.name | endswith("-macOS.dmg")) | select(.name != "PoteNad-macOS.dmg") | .digest | ltrimstr("sha256:")')"
+          CURRENT_VERSION="$(ruby -ne 'puts $1 if /^  version "([^"]+)"/' Casks/potenad.rb)"
+          CURRENT_SHA256="$(ruby -ne 'puts $1 if /^  sha256 "([^"]+)"/' Casks/potenad.rb)"
+
+          if [ "$VERSION" = "$CURRENT_VERSION" ] && [ "$SHA256" = "$CURRENT_SHA256" ]; then
+            echo "PoteNad $VERSION is already current."
+            exit 0
+          fi
+
+          VERSION="$VERSION" SHA256="$SHA256" ruby -pi -e '
+            sub!(/^  version ".*"$/, %(  version "#{ENV.fetch("VERSION")}"))
+            sub!(/^  sha256 ".*"$/, %(  sha256 "#{ENV.fetch("SHA256")}"))
+          ' Casks/potenad.rb
+
+          ruby -c Casks/potenad.rb
+          git diff --check
+          git config user.name "$(gh api "repos/PoteNad/potenad/commits/v$VERSION" --jq .commit.author.name)"
+          git config user.email "$(gh api "repos/PoteNad/potenad/commits/v$VERSION" --jq .commit.author.email)"
+          git add Casks/potenad.rb
+          git commit -m "Update PoteNad to $VERSION"
+          git push
