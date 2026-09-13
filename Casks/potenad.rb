@@ -1,6 +1,6 @@
 cask "potenad" do
-  version "3.0.2"
-  sha256 "27f041df511455525fa2c9247539d8d7754af6f0b5100c9ad45e14688075c68e"
+  version "3.0.3"
+  sha256 "aa835e4580cc8f5f2a4d37bf43a5d83b60178e1e1b244da85a088c53e7dd6b64"
 
   url "https://github.com/PoteNad/potenad/releases/download/v#{version}/PoteNad-#{version}-macOS.dmg"
   name "PoteNad"
