@@ -6,6 +6,12 @@ Install [PoteNad](https://github.com/PoteNad/potenad):
 brew install --cask PoteNad/tap/potenad
 ```
 
-PoteNad is included in Homebrew's normal `brew upgrade` cycle.
+Install [Plainst](https://github.com/PoteNad/plainst):
 
-PoteNad is not Apple-notarized. The cask verifies the app bundle and removes its quarantine attribute so it can open normally after installation.
+```sh
+brew install --cask PoteNad/tap/plainst
+```
+
+Both apps are included in Homebrew's normal `brew upgrade` cycle.
+
+The apps are not Apple-notarized. Each cask verifies the app bundle and removes its quarantine attribute so it can open normally after installation.

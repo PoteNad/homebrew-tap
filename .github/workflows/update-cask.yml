@@ -14,29 +14,44 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Update to the latest PoteNad release
+      - name: Update to the latest releases
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="$(gh api repos/PoteNad/potenad/releases/latest --jq '.tag_name | ltrimstr("v")')"
-          SHA256="$(gh api repos/PoteNad/potenad/releases/latest --jq '.assets[] | select(.name | endswith("-macOS.dmg")) | select(.name != "PoteNad-macOS.dmg") | .digest | ltrimstr("sha256:")')"
-          CURRENT_VERSION="$(ruby -ne 'puts $1 if /^  version "([^"]+)"/' Casks/potenad.rb)"
-          CURRENT_SHA256="$(ruby -ne 'puts $1 if /^  sha256 "([^"]+)"/' Casks/potenad.rb)"
+          # update CASK REPOSITORY APP: points Casks/CASK.rb at the latest release of REPOSITORY.
+          update() {
+            CASK="$1"
+            REPOSITORY="$2"
+            APP="$3"
+            FILE="Casks/$CASK.rb"
 
-          if [ "$VERSION" = "$CURRENT_VERSION" ] && [ "$SHA256" = "$CURRENT_SHA256" ]; then
-            echo "PoteNad $VERSION is already current."
-            exit 0
-          fi
+            if ! VERSION="$(gh api "repos/$REPOSITORY/releases/latest" --jq '.tag_name | ltrimstr("v")')"; then
+              echo "$APP has no release yet."
+              return 0
+            fi
+            SHA256="$(gh api "repos/$REPOSITORY/releases/latest" --jq ".assets[] | select(.name | endswith(\"-macOS.dmg\")) | select(.name != \"$APP-macOS.dmg\") | .digest | ltrimstr(\"sha256:\")")"
+            CURRENT_VERSION="$(ruby -ne 'puts $1 if /^  version "([^"]+)"/' "$FILE")"
+            CURRENT_SHA256="$(ruby -ne 'puts $1 if /^  sha256 "([^"]+)"/' "$FILE")"
 
-          VERSION="$VERSION" SHA256="$SHA256" ruby -pi -e '
-            $_.sub!(/^  version ".*"$/, %(  version "#{ENV.fetch("VERSION")}"))
-            $_.sub!(/^  sha256 ".*"$/, %(  sha256 "#{ENV.fetch("SHA256")}"))
-          ' Casks/potenad.rb
+            if [ "$VERSION" = "$CURRENT_VERSION" ] && [ "$SHA256" = "$CURRENT_SHA256" ]; then
+              echo "$APP $VERSION is already current."
+              return 0
+            fi
 
-          ruby -c Casks/potenad.rb
-          git diff --check
-          git config user.name "$(gh api "repos/PoteNad/potenad/commits/v$VERSION" --jq .commit.author.name)"
-          git config user.email "$(gh api "repos/PoteNad/potenad/commits/v$VERSION" --jq .commit.author.email)"
-          git add Casks/potenad.rb
-          git commit -m "Update PoteNad to $VERSION"
+            VERSION="$VERSION" SHA256="$SHA256" ruby -pi -e '
+              $_.sub!(/^  version ".*"$/, %(  version "#{ENV.fetch("VERSION")}"))
+              $_.sub!(/^  sha256 ".*"$/, %(  sha256 "#{ENV.fetch("SHA256")}"))
+            ' "$FILE"
+
+            ruby -c "$FILE"
+            git diff --check
+            git add "$FILE"
+            git \
+              -c user.name="$(gh api "repos/$REPOSITORY/commits/v$VERSION" --jq .commit.author.name)" \
+              -c user.email="$(gh api "repos/$REPOSITORY/commits/v$VERSION" --jq .commit.author.email)" \
+              commit -m "Update $APP to $VERSION"
+          }
+
+          update potenad PoteNad/potenad PoteNad
+          update plainst PoteNad/plainst Plainst
           git push
