@@ -1,6 +1,6 @@
 cask "plainst" do
-  version "0.1.4"
-  sha256 "8eacc2ced24552d4852a143808312f8b64f643774bf17e4d857530e51e16ab3c"
+  version "0.1.5"
+  sha256 "87c4c95a114035f34782c1f309907f0bbbc6c51e8733ea3a79f0142da14d8d1c"
 
   url "https://github.com/PoteNad/plainst/releases/download/v#{version}/Plainst-#{version}-macOS.dmg"
   name "Plainst"
