@@ -54,4 +54,5 @@ jobs:
 
           update potenad PoteNad/potenad PoteNad
           update plainst PoteNad/plainst Plainst
+          update bristle PoteNad/bristle Bristle
           git push
