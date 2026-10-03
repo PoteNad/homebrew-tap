@@ -1,6 +1,6 @@
 cask "bristle" do
-  version "0.1.1"
-  sha256 "359597dac089e9f18d4e2ae8f0d7620886e7a5bfcac492f7820512b06d626388"
+  version "0.1.2"
+  sha256 "9eb8491557debfd22d870fb1c79626fc189795656a65d96f75107c0cfa0b5744"
 
   url "https://github.com/PoteNad/bristle/releases/download/v#{version}/Bristle-#{version}-macOS.dmg"
   name "Bristle"
